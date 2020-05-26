@@ -1,16 +1,13 @@
 import logging
 import dataobtain
-import telegram
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
 def start(update, context):
     update.message.reply_text("Здарова, просто нажми на эту хрень /kurs")
-
-
 
 def kurs(update, context):
     caption = 'Текущий курс {}'.format(dataobtain.priceNow)

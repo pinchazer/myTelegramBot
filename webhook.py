@@ -19,15 +19,12 @@ from telegram import ChatAction
 # for bot typing...
 def send_action(action):
     """Sends `action` while processing func command."""
-
     def decorator(func):
         @wraps(func)
         def command_func(update, context, *args, **kwargs):
             context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
             return func(update, context, *args, **kwargs)
-
         return command_func
-
     return decorator
 
 
@@ -41,7 +38,7 @@ app = Flask(__name__)
 sslify = SSLify(app)
 
 TOKEN = "1232259102:AAGdytN-3fmnc-BV3Gc9xML568mUeXpgbF8"
-my_webhook_url = 'https://b97106fe.eu.ngrok.io'
+my_webhook_url = 'https://703c5e08.eu.ngrok.io'
 port = '88'
 
 # Stages
@@ -100,8 +97,7 @@ def euro(update, context):
 
 def signals_menu(update, context):
     update.message.reply_text("Выберите действие:", reply_markup=signals_markup_reply())
-    # Store chat_id for signal message
-    # context.user_data['chat_id'] = update.message.chat_id
+
 
 
 def wrong_val_message(update, context):
@@ -115,8 +111,7 @@ def del_dol(update, context):
     query.edit_message_text(text='Выберите действие:\nсигнал для $ удален', reply_markup=signals_markup_reply())
 
     context.bot_data['dol_data'].update({update.message.chat_id: None})
-    #for jobObj in context.job_queue.get_jobs_by_name('dollar_routine'):
-    #    jobObj.schedule_removal()
+
 
 
 def del_eur(update, context):
@@ -125,8 +120,7 @@ def del_eur(update, context):
     query.edit_message_text(text='Выберите действие:\nсигнал для \u20AC удален', reply_markup=signals_markup_reply())
 
     context.bot_data['eur_data'].update({update.message.chat_id: None})
-    #for jobObj in context.job_queue.get_jobs_by_name('euro_routine'):
-    #    jobObj.schedule_removal()
+
 
 
 
@@ -156,19 +150,11 @@ def signal_dol_setup(update, context):  # part of ConversationHandler
                                          {'val': float(update.message.text), 'trig_less': False, 'trig_more': False}
                                      })
 
-    # context.user_data['dol'] = update.message.text
-    # context.user_data['chat_id'] = update.message.chat_id
 
     # remove old dollar_routine to make in run again with new signal value
     for jobObj in context.job_queue.get_jobs_by_name('dollar_routine'):
         jobObj.schedule_removal()
 
-    # Inner Queue() object for monitoring signal value crossing
-    #context.user_data['queue_dol'] = {'trig_less': False, 'trig_more': False}
-
-    # context.user_data['queue_dol'] = Queue()
-    # context.user_data['queue_dol'].put(False)
-    # context.user_data['queue_dol'].put(False)
 
     context.job_queue.run_repeating(callback=dataobtain.signal_routine_dollar, interval=20,
                                     first=10, name='dollar_routine', context=context.bot_data)
@@ -188,10 +174,6 @@ def signal_eur_setup(update, context):  # part of ConversationHandler
     for jobObj in context.job_queue.get_jobs_by_name('euro_routine'):
         jobObj.schedule_removal()
 
-    # Inner Queue() object for monitoring signal value crossing
-    # context.user_data['queue_eur'] = Queue()
-    # context.user_data['queue_eur'].put(False)
-    #context.user_data['queue_eur'].put(False)
 
     context.job_queue.run_repeating(callback=dataobtain.signal_routine_euro, interval=20,
                                     first=10, name='euro_routine', context=context.bot_data)
@@ -267,12 +249,7 @@ update_queue, dp = setup(TOKEN)
 # daily routine for picture updating
 dp.job_queue.run_daily(callback=dataobtain.daily_routine, days=(0, 1, 2, 3, 4),
                        time=t, name='run_daily')
-# 20 sec routine for currency updating
-#dp.job_queue.run_repeating(callback=dataobtain.show_euro, interval=20,
-#                           first=0, name='show_euro')
-#dp.job_queue.run_repeating(callback=dataobtain.show_dollar, interval=20,
-#                           first=0, name='show_dollar')
-# start queue with jobs
+
 dp.job_queue.start()
 
 
@@ -293,4 +270,4 @@ def webhook():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
