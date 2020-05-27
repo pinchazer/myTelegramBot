@@ -5,3 +5,5 @@ seaborn
 flask
 flask_sslify
 pandas==1.0.1
+lxml
+gunicorn
