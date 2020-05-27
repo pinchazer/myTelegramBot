@@ -14,6 +14,9 @@ import dataobtain
 from datetime import time
 from functools import wraps
 from telegram import ChatAction
+from config import Configuration
+
+
 
 
 # for bot typing...
@@ -28,6 +31,7 @@ def send_action(action):
     return decorator
 
 
+
 send_typing_action = send_action(ChatAction.TYPING)
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,9 +41,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 sslify = SSLify(app)
 
-TOKEN = "1232259102:AAGdytN-3fmnc-BV3Gc9xML568mUeXpgbF8"
-my_webhook_url = 'https://703c5e08.eu.ngrok.io'
-port = '88'
+#TOKEN = "1232259102:AAGdytN-3fmnc-BV3Gc9xML568mUeXpgbF8"
+#my_webhook_url = 'https://9bbe98be.ngrok.io'
+#port = '88'
 
 # Stages
 DOLLAR_SIG, EURO_SIG, DEL_DOLL, DEL_EUR = range(4)
@@ -192,8 +196,8 @@ def setup(token):
     # Create bot, update queue and dispatcher instances
     bot = Bot(token)
     # Setup webhook if it was changed
-    if bot.getWebhookInfo()['url'] != my_webhook_url:
-        bot.set_webhook(webhook_url='{0}/:{1}/{2}'.format(my_webhook_url, port, TOKEN))
+    if bot.getWebhookInfo()['url'] != Configuration.WEBHOOK:
+        bot.set_webhook(webhook_url='{0}/:{1}/{2}'.format(Configuration.WEBHOOK, Configuration.PORT, Configuration.TOKEN))
     update_queue = Queue()
     job_queue = telegram.ext.JobQueue()
 
@@ -244,7 +248,7 @@ def setup(token):
 
 # use utc time
 t = time(hour=6, minute=0, second=0)
-update_queue, dp = setup(TOKEN)
+update_queue, dp = setup(Configuration.TOKEN)
 
 # daily routine for picture updating
 dp.job_queue.run_daily(callback=dataobtain.daily_routine, days=(0, 1, 2, 3, 4),
@@ -258,7 +262,7 @@ def hello_world():
     return '<p style="text-align: center;"><strong>КУКУ)</strong></p>'
 
 
-@app.route('/:88/' + TOKEN, methods=["POST", "GET"])
+@app.route('/:88/' + Configuration.TOKEN, methods=["POST", "GET"])
 def webhook():
     if request.method == 'POST':
         gjson = request.get_json()
